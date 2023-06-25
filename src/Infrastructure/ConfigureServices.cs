@@ -1,13 +1,17 @@
 ﻿using CleanArchitecture.Application.Common.Interfaces;
+using CleanArchitecture.Domain.Events;
+using CleanArchitecture.Infrastructure.Cloud;
 using CleanArchitecture.Infrastructure.Files;
 using CleanArchitecture.Infrastructure.Identity;
 using CleanArchitecture.Infrastructure.Persistence;
 using CleanArchitecture.Infrastructure.Persistence.Interceptors;
 using CleanArchitecture.Infrastructure.Services;
+using Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -44,6 +48,7 @@ public static class ConfigureServices
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
+        services.AddSingleton<IEventSerializer, JsonEventSerializer>();
 
         services.AddAuthentication()
             .AddIdentityServerJwt();
@@ -51,6 +56,10 @@ public static class ConfigureServices
         services.AddAuthorization(options =>
             options.AddPolicy("CanPurge", policy => policy.RequireRole("Administrator")));
 
+        services.Configure<SqsOptions>(configuration.GetSection("SqsOptions"));
+
+        services.AddTransient<IMessageBrokerService, MessageBrokerService>();
+        services.AddSingleton<ISqsClientFactory, SqsClientFactory>();
         return services;
     }
 }

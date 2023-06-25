@@ -1,12 +1,15 @@
 using CleanArchitecture.Infrastructure.Persistence;
+using Common;
+using WebUI.Backgroundobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddApplicationServices();
+builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebUIServices();
-
+builder.Services.AddSingleton<OutboxProcessor>();
+builder.Services.AddHostedService(provider => provider.GetRequiredService<OutboxProcessor>());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

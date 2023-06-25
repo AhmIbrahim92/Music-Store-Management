@@ -1,4 +1,6 @@
-﻿namespace CleanArchitecture.Domain.Events;
+﻿using System.Text.Json.Serialization;
+
+namespace CleanArchitecture.Domain.Events;
 
 public class TodoItemCreatedEvent : BaseEvent
 {
