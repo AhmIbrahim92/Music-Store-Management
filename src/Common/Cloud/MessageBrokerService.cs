@@ -34,7 +34,14 @@ public class MessageBrokerService : IMessageBrokerService
             {
                 var m = JsonSerializer.Deserialize<TodoCreatedModel>(message.Body);
                 if (m != null)
+                {
                     messages.Add(m);
+                    await _sqsClientFactory.GetSqsClient().DeleteMessageAsync(new DeleteMessageRequest
+                    {
+                        QueueUrl = _sqsClientFactory.GetSqsQueue(),
+                        ReceiptHandle = message.ReceiptHandle
+                    });
+                }
             }
             catch
             {
